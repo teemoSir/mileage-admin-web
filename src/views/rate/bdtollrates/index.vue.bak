@@ -1,0 +1,181 @@
+<template>
+	<a-card :bordered="false">
+		<a-form ref="searchFormRef" name="advanced_search" :model="searchFormState" class="ant-advanced-search-form">
+			<a-row :gutter="24">
+				<a-col :span="6">
+					<a-form-item label="车辆类型" name="vehicleType">
+						<a-select
+							v-model:value="searchFormState.vehicleType"
+							placeholder="请选择车辆类型"
+							:options="vehicleTypeOptions"
+						/>
+					</a-form-item>
+				</a-col>
+				<a-col :span="6">
+					<a-button type="primary" @click="table.refresh(true)">查询</a-button>
+					<a-button style="margin: 0 8px" @click="reset">重置</a-button>
+				</a-col>
+			</a-row>
+		</a-form>
+		<s-table
+			ref="table"
+			:columns="columns"
+			:data="loadData"
+			:alert="options.alert.show"
+			bordered
+			:row-key="(record) => record.rateId"
+			:tool-config="toolConfig"
+			:row-selection="options.rowSelection"
+		>
+			<template #operator class="table-operator">
+				<a-space>
+					<a-button type="primary" @click="formRef.onOpen()" v-if="hasPerm('bdTollRatesAdd')">
+						<template #icon><plus-outlined /></template>
+						新增
+					</a-button>
+					<xn-batch-delete
+						v-if="hasPerm('bdTollRatesBatchDelete')"
+						:selectedRowKeys="selectedRowKeys"
+						@batchDelete="deleteBatchBdTollRates"
+					/>
+				</a-space>
+			</template>
+			<template #bodyCell="{ column, record }">
+				<template v-if="column.dataIndex === 'vehicleType'">
+					{{ $TOOL.dictTypeData('vehicleType', record.vehicleType.toString()) }}
+				</template>
+				<template v-if="column.dataIndex === 'roadType'">
+					{{ $TOOL.dictTypeData('roadType', record.roadType.toString()) }}
+				</template>
+				<template v-if="column.dataIndex === 'energyType'">
+					{{ $TOOL.dictTypeData('energyType', record.energyType.toString()) }}
+				</template>
+				<template v-if="column.dataIndex === 'action'">
+					<a-space>
+						<a @click="formRef.onOpen(record)" v-if="hasPerm('bdTollRatesEdit')">编辑</a>
+						<a-divider type="vertical" v-if="hasPerm(['bdTollRatesEdit', 'bdTollRatesDelete'], 'and')" />
+						<a-popconfirm title="确定要删除吗？" @confirm="deleteBdTollRates(record)">
+							<a-button type="link" danger size="small" v-if="hasPerm('bdTollRatesDelete')">删除</a-button>
+						</a-popconfirm>
+					</a-space>
+				</template>
+			</template>
+		</s-table>
+	</a-card>
+	<Form ref="formRef" @successful="table.refresh(true)" />
+</template>
+
+<script setup name="bdtollrates">
+	import tool from '@/utils/tool'
+	import Form from './form.vue'
+	import bdTollRatesApi from '@/api/rate/bdTollRatesApi'
+	let searchFormState = reactive({})
+	const searchFormRef = ref()
+	const table = ref()
+	const formRef = ref()
+	const toolConfig = { refresh: true, height: true, columnSetting: true, striped: false }
+	const columns = [
+		/*		{
+			title: '费率版本ID',
+			dataIndex: 'versionId'
+		},*/
+		{
+			title: '车辆类型',
+			dataIndex: 'vehicleType'
+		},
+		{
+			title: '车型系数',
+			dataIndex: 'vehicleCoefficient'
+		},
+		{
+			title: '道路类型',
+			dataIndex: 'roadType'
+		},
+		{
+			title: '道路类型系数',
+			dataIndex: 'roadCoefficient'
+		},
+		{
+			title: '能源类型',
+			dataIndex: 'energyType'
+		},
+		{
+			title: '能源类型折扣',
+			dataIndex: 'energyDiscount'
+		},
+		{
+			title: '基础费率常数(元/公里)',
+			dataIndex: 'baseRate'
+		},
+		{
+			title: '最终费率结果(元/公里)',
+			dataIndex: 'finalRate'
+		},
+		{
+			title: '创建时间',
+			dataIndex: 'createAt'
+		},
+		{
+			title: '更新时间',
+			dataIndex: 'updateAt'
+		},
+		{
+			title: '创建人',
+			dataIndex: 'createUser'
+		}
+	]
+	// 操作栏通过权限判断是否显示
+	if (hasPerm(['bdTollRatesEdit', 'bdTollRatesDelete'])) {
+		columns.push({
+			title: '操作',
+			dataIndex: 'action',
+			align: 'center',
+			width: '150px'
+		})
+	}
+	const selectedRowKeys = ref([])
+	// 列表选择配置
+	const options = {
+		// columns数字类型字段加入 needTotal: true 可以勾选自动算账
+		alert: {
+			show: true,
+			clear: () => {
+				selectedRowKeys.value = ref([])
+			}
+		},
+		rowSelection: {
+			onChange: (selectedRowKey, selectedRows) => {
+				selectedRowKeys.value = selectedRowKey
+			}
+		}
+	}
+	const loadData = (parameter) => {
+		const searchFormParam = JSON.parse(JSON.stringify(searchFormState))
+		return bdTollRatesApi.bdTollRatesPage(Object.assign(parameter, searchFormParam)).then((data) => {
+			return data
+		})
+	}
+	// 重置
+	const reset = () => {
+		searchFormRef.value.resetFields()
+		table.value.refresh(true)
+	}
+	// 删除
+	const deleteBdTollRates = (record) => {
+		let params = [
+			{
+				rateId: record.rateId
+			}
+		]
+		bdTollRatesApi.bdTollRatesDelete(params).then(() => {
+			table.value.refresh(true)
+		})
+	}
+	// 批量删除
+	const deleteBatchBdTollRates = (params) => {
+		bdTollRatesApi.bdTollRatesDelete(params).then(() => {
+			table.value.clearRefreshSelected()
+		})
+	}
+	const vehicleTypeOptions = tool.dictList('vehicleType')
+</script>

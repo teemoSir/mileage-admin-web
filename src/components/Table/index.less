@@ -1,0 +1,117 @@
+.table-wrapper{
+}
+
+/*偶数行样式*/
+.table-striped td {
+    background-color: #F7F9FA;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+}
+/*表格第一列*/
+.table-striped td:first-child {
+	background-color: #F7F9FA;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	border-bottom-left-radius: 8px;
+	border-top-left-radius: 8px;
+}
+/*表格最后一列*/
+.table-striped td:last-child {
+	background-color: #F7F9FA;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	border-bottom-right-radius: 8px;
+	border-top-right-radius: 8px;
+}
+/*奇数行样式*/
+.table-striped-common td {
+	background-color: #FFFFFF;
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+}
+/*去掉表格每行之间的横线*/
+.ant-table-tbody > tr > td {
+	border: none;
+}
+/*表头第一列*/
+.ant-table-container table > thead > tr:first-child th:first-child {
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	border-bottom-left-radius: 8px;
+	border-top-left-radius: 8px;
+	background: #F7F9FA;
+}
+/*表头最后一列*/
+.ant-table-container table > thead > tr:last-child th:last-child {
+	height: 30px;
+	line-height: 30px;
+	font-size: 12px;
+	border-bottom-right-radius: 8px;
+	border-top-right-radius: 8px;
+	background: #F7F9FA;
+}
+/*去掉表格每行之间的横线*/
+.ant-table-container > thead > tr > td {
+	border: none;
+}
+.ant-table-thead > tr > th {
+	border: none;
+}
+.s-table-tool{
+  display: flex;
+  margin-bottom: 16px;
+  .s-table-tool-left{
+      flex: 1;
+  }
+  .s-table-tool-right{
+    .s-tool-item{
+      font-size: 16px;
+      @apply ml-4;
+      cursor: pointer;
+
+    }
+  }
+}
+
+.s-tool-column-item{
+  display: flex;
+  align-items: center;
+  padding: 4px 16px 4px 4px;
+  .ant-checkbox-wrapper{
+    flex: 1;
+  }
+  .s-tool-column-handle{
+    opacity: .8;
+    cursor: move;
+    .anticon-more{
+      font-size: 12px;
+      & + .anticon-more{
+        margin: 0px 4px 0 -8px;
+      }
+    }
+  }
+}
+.s-tool-column-header{
+  padding: 5px 16px 10px 24px;
+  min-width: 180px;
+}
+.s-tool-column{
+  .ant-divider{
+    margin: 0;
+  }
+  .ant-checkbox-group{
+    padding: 4px 0;
+    display: block;
+  }
+}
+
+.s-table-column-settings .ant-popover-inner-content{
+  padding: 0;
+}
+
+
